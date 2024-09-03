@@ -13,6 +13,7 @@ Route::get('/register', [AuthController::class, "showRegister"]);
 Route::post('/register', [AuthController::class, "registerNew"]);
 
 Route::get('/dashboard', [AuthController::class, "showDashboard"])->name("dashboard")->middleware(Islogin::class);
-
+Route::get('/show-profile', [AuthController::class, "showProfile"])->middleware(Islogin::class);
+Route::put('update-profile/{id}',[AuthController::class, "updateProfile"])->middleware(Islogin::class);
 
 Route::get("logout",[AuthController::class, "logout"]);

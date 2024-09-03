@@ -49,19 +49,23 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        .input-group span{
+
+        .input-group span {
             color: red;
             font-size: 14px;
             font-weight: 500;
         }
+
         .alert {
             text-align: center;
         }
-        .alert span{
+
+        .alert span {
             color: red;
             font-size: 16px;
             font-weight: 600;
         }
+
         .login-button {
             width: 100%;
             padding: 10px;
@@ -77,10 +81,12 @@
         .login-button:hover {
             background-color: #0056b3;
         }
+
         .toggle-link {
             text-align: center;
         }
-        .toggle-link a{
+
+        .toggle-link a {
             text-decoration: none;
         }
     </style>
@@ -93,17 +99,30 @@
                 <span>{{ session('error') }}</span>
             </div>
         @endif
+        @if($errors->has('message'))
+            <div class="alert alert-danger">
+                <span>{{ $errors->first('message') }}</span>
+            </div>
+        @endif
         <form class="login-form" action="/login" method="POST">
             @csrf
             <h2>Login</h2>
             <div class="input-group">
                 <label for="username">Email</label>
-                <input type="text" id="name" name="email" value="{{ old('email') }}" required>
+                @php 
+                    $rememberEmail;
+                    if ($errors->first('dataEmail')) {
+                        $rememberEmail = $errors->first('dataEmail');
+                    } else {
+                        $rememberEmail = old('email');
+                    }
+                @endphp
+                <input type="text" id="name" name="email" value="{{ $rememberEmail }}">
                 <span>{{ $errors->first('email') }}</span>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" value="{{ old('password') }}" required>
+                <input type="password" id="password" name="password" value="{{ old('password') }}">
                 <span>{{ $errors->first('password') }}</span>
             </div>
             <button type="submit" class="login-button">Login</button>

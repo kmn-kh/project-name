@@ -29,6 +29,27 @@
             padding: 20px;
         }
 
+        .profile {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile a img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .profile h3 {
+            margin-bottom: 5px;
+        }
+
+        .profile p {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
         .sidebar h2 {
             text-align: center;
             margin-bottom: 30px;
@@ -36,10 +57,12 @@
 
         .sidebar ul {
             list-style-type: none;
+            width: 100%;
         }
 
         .sidebar ul li {
             margin: 20px 0;
+            text-align: center;
         }
 
         .sidebar ul li a {
@@ -93,6 +116,15 @@
     <div class="dashboard">
         <!-- Sidebar -->
         <div class="sidebar">
+            <!-- User Profile -->
+            <div class="profile">
+                <a href="/show-profile">
+                    <img src="{{ asset('uploads/' . (auth()->user()->img ?? 'Default.png')) }}" alt="User Profile">
+                </a>
+                <h3>{{ auth()->user()->name }}</h3>
+                <p>{{ auth()->user()->email }}</p>
+            </div>
+
             <h2>Dashboard</h2>
             <ul>
                 <li><a href="#">Home</a></li>

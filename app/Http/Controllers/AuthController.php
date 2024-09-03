@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -29,24 +30,65 @@ class AuthController extends Controller
     {
         return view("login");
     }
-    public function userLogin(Request $request){
-        $request->validate([
+    public function userLogin(Request $request)
+    {
+        $data = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6|max:10',
         ]);
 
         $compare = $request->except(["_token"]);
-        
-        if(auth()->attempt($compare)){
+
+        if (auth()->attempt($compare)) {
             // Find information of user and create session id to cookie on the browser
             return redirect()->route('dashboard');
         }
-        return redirect()->back()->withErrors(['message' => 'Invalid credential']);
+        return redirect()->back()->withErrors(['message' => 'Invalid credential', "dataEmail" => $data["email"]]);
     }
-    public function showDashboard(){
+    public function showDashboard()
+    {
         return view("dashboard");
     }
-    public function logout(){
+    public function showProfile()
+    {
+        return view("updateProfile");
+    }
+    public function updateProfile(Request $request)
+{
+    // Validate the request to ensure an image and name are provided
+    $request->validate([
+        'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'name' => 'required|string|max:255',
+    ]);
+
+    // Retrieve the uploaded file
+    $file = $request->file('img');
+
+    // Generate a unique filename based on the current time and the original filename
+    $fileName = time() . '_' . $file->getClientOriginalName();
+
+    // Move the file to the 'uploads' directory in the public path
+    $file->move(public_path('uploads'), $fileName);
+
+    // Get the currently authenticated user
+    $user = auth()->user();
+    
+    // Update user's profile image
+    $user->img = $fileName;
+    
+    // Update user's name
+    $user->name = $request->input('name');
+    
+    // Save the changes to the database
+    $user->save();
+
+    // Redirect to the dashboard with a success message
+    return redirect()->route('dashboard');
+}
+
+
+    public function logout()
+    {
         auth()->logout();
         return redirect()->route("login");
     }
