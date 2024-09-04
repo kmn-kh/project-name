@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +12,10 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        .form-group span{
+            color: red;
+            font-size: 14px;
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -88,7 +92,6 @@
 <body>
 
     <div class="update-profile-container">
-
         <h2>Update Profile</h2>
         <form action="update-profile/{{ auth()->user()->id }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -96,9 +99,9 @@
             <!-- Profile Picture -->
             <div class="form-group">
                 <label for="profile-picture">Profile Picture</label>
-                <img src="{{ asset('uploads/' . (auth()->user()->img ?? 'Default.png')) }}"
-                    alt="Current Profile Picture">
-                <input type="file" id="img" name="img">
+                <img id="profile-image-preview" src="{{ asset('uploads/' . (auth()->user()->img ?? 'Default.png')) }}"
+                    alt="Current Profile Picture" style="max-width: 150px;">
+                <input type="file" id="img" name="img" accept="image/*" onchange="previewImage(event)">
                 <span>{{ $errors->first('img') }}</span>
             </div>
             <!-- Name -->
@@ -110,8 +113,18 @@
             <!-- Submit Button -->
             <button type="submit">Update Profile</button>
         </form>
-
     </div>
+
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('profile-image-preview');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
 
 </body>
 

@@ -14,9 +14,15 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|max:10|confirmed'
+            'password' => 'required|min:6|max:10|confirmed',
+            'role' => 'nullable',
+            'img' => 'nullable',
         ]);
         $data = $request->except(["_token", "password_confirmation"]);
+
+        if (empty($data['role'])) {
+            $data['role'] = 'user';
+        }
         User::create($data);
 
         return redirect()->route('login');
@@ -54,38 +60,48 @@ class AuthController extends Controller
         return view("updateProfile");
     }
     public function updateProfile(Request $request)
-{
-    // Validate the request to ensure an image and name are provided
-    $request->validate([
-        'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'name' => 'required|string|max:255',
-    ]);
+    {
+        // Validate the request to ensure name is provided; image is optional
+        $request->validate([
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name' => 'required|string|max:255',
+        ]);
 
-    // Retrieve the uploaded file
-    $file = $request->file('img');
+        // Get the currently authenticated user
+        $user = auth()->user();
 
-    // Generate a unique filename based on the current time and the original filename
-    $fileName = time() . '_' . $file->getClientOriginalName();
+        // Check if a new image was uploaded
+        if ($request->hasFile('img')) {
+            // Define the old file path
+            $oldFilePath = public_path('uploads') . '/' . $user->img;
 
-    // Move the file to the 'uploads' directory in the public path
-    $file->move(public_path('uploads'), $fileName);
+            // Check if the file exists and delete it
+            if ($user->img && file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
 
-    // Get the currently authenticated user
-    $user = auth()->user();
-    
-    // Update user's profile image
-    $user->img = $fileName;
-    
-    // Update user's name
-    $user->name = $request->input('name');
-    
-    // Save the changes to the database
-    $user->save();
+            // Retrieve the uploaded file
+            $file = $request->file('img');
 
-    // Redirect to the dashboard with a success message
-    return redirect()->route('dashboard');
-}
+            // Generate a unique filename based on the current time and the original filename
+            $fileName = time() . '_' . $file->getClientOriginalName();
 
+            // Move the file to the 'uploads' directory in the public path
+            $file->move(public_path('uploads'), $fileName);
+
+            // Update user's profile image
+            $user->img = $fileName;
+        }
+
+        // Update user's name
+        $user->name = $request->input('name');
+
+        // Save the changes to the database
+        $user->save();
+
+        // Redirect to the dashboard with a success message
+        return redirect()->route('dashboard');
+    }
 
     public function logout()
     {

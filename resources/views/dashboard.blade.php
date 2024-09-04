@@ -51,8 +51,7 @@
         }
 
         .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
+            margin: 0 0 16px 22px;
         }
 
         .sidebar ul {
@@ -61,8 +60,7 @@
         }
 
         .sidebar ul li {
-            margin: 20px 0;
-            text-align: center;
+            margin: 8px 0px 8px 22px;
         }
 
         .sidebar ul li a {

@@ -80,8 +80,8 @@
         <h2>Register</h2>
         <form action="/register" method="POST">
             @csrf
-            <input type="hidden" value="user" name="role">
-            <input type="hidden" value="Default.png" name="img">
+            <!-- <input type="hidden" value="user" name="role">
+            <input type="hidden" value="Default.png" name="img"> -->
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="name" value="{{ old('name') }}" required>
