@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Islogin
+class userlogin
 {
     /**
      * Handle an incoming request.
@@ -19,9 +19,14 @@ class Islogin
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
         }
-        
-        // Allow the request to proceed
+
+        // Get the authenticated user
+        $user = auth()->user();
+
+        // Check the user's role and redirect accordingly
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboardAdmin');
+        }
         return $next($request);
     }
-
 }

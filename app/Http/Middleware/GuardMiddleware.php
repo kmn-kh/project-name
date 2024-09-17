@@ -15,10 +15,21 @@ class GuardMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check user logged 
-        if(auth()->check()){
+        // Check if the user is authenticated
+        if (auth()->check()) {
+            // Get the authenticated user
+            $user = auth()->user();
+
+            // Check the user's role and redirect accordingly
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboardAdmin');
+            }
+            
             return redirect()->route('dashboard');
         }
+
+        // If the user is not authenticated, proceed with the request
         return $next($request);
     }
+
 }

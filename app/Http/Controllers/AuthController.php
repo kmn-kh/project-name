@@ -10,23 +10,33 @@ class AuthController extends Controller
 {
     //
     public function registerNew(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|unique:users,name',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|max:10|confirmed',
-            'role' => 'nullable',
-            'img' => 'nullable',
-        ]);
-        $data = $request->except(["_token", "password_confirmation"]);
+{
+    $request->validate([
+        'name' => 'required|unique:users,name',
+        'email' => 'required|email|unique:users,email',
+        'password' => [
+            'required',
+            'min:6',
+            'max:10',
+            'confirmed',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}$/'
+        ],
+        'role' => 'nullable',
+        'img' => 'nullable',
+    ], [
+        'password.regex' => 'Please choose a stronger password. Try a mix of letters, numbers, and symbols.',
+    ]);
 
-        if (empty($data['role'])) {
-            $data['role'] = 'user';
-        }
-        User::create($data);
+    $data = $request->except(["_token", "password_confirmation"]);
 
-        return redirect()->route('login');
-    }
+    // Always set the role to 'user'
+    $data['role'] = 'user';
+
+    User::create($data);
+
+    return redirect()->route('login');
+}
+
 
     public function showRegister()
     {
@@ -99,10 +109,17 @@ class AuthController extends Controller
         // Save the changes to the database
         $user->save();
 
+        // Check if the user's role is not 'admin', then redirect
+        if ($user->role !== 'admin') {
+            return redirect()->route('dashboard');
+        }
         // Redirect to the dashboard with a success message
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboardAdmin');
     }
-
+    public function showAdboard()
+    {
+        return view("dashboardAdmin");
+    }
     public function logout()
     {
         auth()->logout();
